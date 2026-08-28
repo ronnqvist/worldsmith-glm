@@ -1,0 +1,20 @@
+{
+  "name": "worldsmith",
+  "version": "1.0.0",
+  "description": "Voice-prompted generative A-Frame WebXR worlds",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "test": "node scripts/sanitize.test.mjs && node scripts/injector.test.mjs"
+  },
+  "dependencies": {
+    "aframe": "^1.8.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "linkedom": "^0.18.0",
+    "vite": "^8.2.2"
+  }
+}
