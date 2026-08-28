@@ -27,6 +27,28 @@ Vite serves the app at `https://<your-lan-ip>:5173` (self-signed HTTPS via
 `@vitejs/plugin-basic-ssl` — WebXR requires a secure context, so plain HTTP
 will not expose XR). For a production build: `npm run build && npm run preview`.
 
+### Deploy to GitHub Pages (static hosting)
+
+The app is fully client-side, so it runs unchanged from GitHub Pages — which
+also gives you a valid HTTPS origin for WebXR, no self-signed warnings.
+
+```bash
+npm run build:pages   # builds the static site into docs/ (+ .nojekyll)
+```
+
+Then publish it:
+
+1. Commit the repository (including `docs/`) and push to GitHub.
+2. In the repo: **Settings → Pages → Build and deployment → Source:
+   "Deploy from a branch"**, branch `main`, folder **`/docs`** → Save.
+3. Your world is live at `https://<user>.github.io/<repo>/` — open it in the
+   Meta Quest Browser, click **Enter VR**, and off you go.
+
+`npm run build:pages` is idempotent and emptying, so re-run and push to
+deploy updates. Relative asset paths (`base: './'`) make it work from the
+project subpath; `docs/.nojekyll` stops GitHub's Jekyll step from interfering.
+Local check: `npm run preview:pages`.
+
 ### Getting an OpenRouter key
 
 1. Create an account at <https://openrouter.ai/>.

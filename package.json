@@ -7,6 +7,8 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview --host",
+    "build:pages": "vite build --outDir docs --emptyOutDir && node -e \"require('fs').writeFileSync('docs/.nojekyll','')\"",
+    "preview:pages": "vite preview --outDir docs --host",
     "test": "node scripts/sanitize.test.mjs && node scripts/injector.test.mjs"
   },
   "dependencies": {

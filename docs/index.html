@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Worldsmith</title>
+  <script type="module" crossorigin src="./assets/index-DSUxwpK-.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DpIHuyMb.css">
+</head>
+<body>
+  <div id="loading">
+    <div class="loading-title">Worldsmith</div>
+    <div class="loading-sub">Warming up the scene&hellip;</div>
+  </div>
+
+  <div id="dom-ui">
+    <header id="topbar">
+      <strong>Worldsmith</strong>
+      <span id="status-line"></span>
+      <span class="spacer"></span>
+      <button id="btn-enter-vr">Enter VR</button>
+      <button id="btn-mr" class="hidden">MR mode</button>
+      <button id="btn-undo">Undo</button>
+      <button id="btn-reset-world">Reset world</button>
+      <button id="btn-toggle-ui">Hide UI</button>
+    </header>
+
+    <div id="prompt-row">
+      <textarea id="prompt-input" rows="2"
+        placeholder='Describe or change your world, e.g. "create a floating island with waterfalls and glowing crystals"'></textarea>
+      <div id="prompt-buttons">
+        <button id="btn-mic" class="hidden">Hold to talk</button>
+        <button id="btn-send">Send</button>
+      </div>
+    </div>
+
+    <div id="side-panels">
+      <details id="panel-settings">
+        <summary>Settings</summary>
+        <label for="set-api-key">OpenRouter API key</label>
+        <input id="set-api-key" type="password" placeholder="sk-or-v1-..." autocomplete="off" />
+        <button id="btn-validate-key">Validate key</button>
+        <span id="validate-result"></span>
+        <label for="set-model">Model</label>
+        <select id="set-model"></select>
+        <label for="set-model-custom">Custom model id (overrides dropdown)</label>
+        <input id="set-model-custom" type="text" placeholder="vendor/model-id" />
+        <label for="set-referer">HTTP-Referer header (optional)</label>
+        <input id="set-referer" type="text" placeholder="https://yoursite.example" />
+        <label for="set-xtitle">X-Title header (optional)</label>
+        <input id="set-xtitle" type="text" placeholder="Worldsmith" />
+        <label class="check"><input id="set-mute" type="checkbox" /> Mute spoken narration</label>
+        <label class="check"><input id="set-vignette" type="checkbox" /> Comfort vignette</label>
+        <label class="check"><input id="set-debug" type="checkbox" /> Diagnostics logging</label>
+      </details>
+
+      <details id="panel-history">
+        <summary>History (last 20)</summary>
+        <ol id="history-list"></ol>
+        <button id="btn-clear-history">Clear history</button>
+      </details>
+
+      <details id="panel-worlds">
+        <summary>Saved worlds</summary>
+        <div class="row">
+          <input id="world-name" type="text" placeholder="World name" />
+          <button id="btn-save-world">Save current</button>
+        </div>
+        <ul id="world-list"></ul>
+        <div class="row">
+          <button id="btn-export">Export .worldsmith.json</button>
+        </div>
+        <div class="row">
+          <button id="btn-import">Import&hellip;</button>
+          <input id="import-file" type="file" accept=".json,application/json" class="hidden" />
+          <span id="import-result"></span>
+        </div>
+        <div id="import-choice" class="hidden">
+          <p>Imported file found. Replace everything, or merge saved worlds/history?</p>
+          <button id="btn-import-replace">Replace</button>
+          <button id="btn-import-merge">Merge</button>
+          <button id="btn-import-cancel">Cancel</button>
+        </div>
+      </details>
+    </div>
+
+    <div id="toasts"></div>
+  </div>
+
+  <a-scene vr-mode-ui="enabled: false"
+           device-permission-ui="enabled: false"
+           loading-screen="enabled: false"
+           renderer="antialias: true; colorManagement: true; alpha: true">
+    <a-assets timeout="1500"></a-assets>
+
+    <a-entity id="world-lights">
+      <a-light type="ambient" color="#c8c8d8" intensity="0.65"></a-light>
+      <a-light type="directional" color="#ffffff" intensity="0.55" position="1 2 1"></a-light>
+    </a-entity>
+
+    <a-sky id="default-sky" color="#0a0e1a"></a-sky>
+
+    <a-entity id="rig" position="0 0 0" wasd-controls="acceleration: 12">
+      <a-entity id="camera" position="0 1.6 0" look-controls="pointerLockEnabled: false">
+        <a-entity id="vignette"
+                  geometry="primitive: cylinder; radius: 0.5; height: 1.4; open-ended: true; segments-radial: 12"
+                  material="color: #000000; side: back; transparent: true; opacity: 0; shader: flat; depth-test: false"></a-entity>
+        <a-entity id="vk-root" position="0 -0.12 -0.9" visible="false"></a-entity>
+      </a-entity>
+      <a-entity id="mic-orb" position="0 1.4 -1.2"
+                geometry="primitive: sphere; radius: 0.09"
+                material="color: #3a6ea5; shader: flat; transparent: true; opacity: 0.9"
+                class="clickable"></a-entity>
+      <a-entity id="caption" position="0 1.78 -1.2" visible="false">
+        <a-text id="caption-text" value="" align="center" width="1.8" wrap-count="32" color="#ffffff"
+                font="fonts/Roboto-msdf.json"></a-text>
+      </a-entity>
+    </a-entity>
+
+    <a-entity id="ctl-left" oculus-touch-controls="hand: left">
+      <a-entity id="wrist-panel" position="0 0.18 -0.14"></a-entity>
+    </a-entity>
+
+    <a-entity id="ctl-right" oculus-touch-controls="hand: right"
+              laser-controls="hand: right"
+              raycaster="objects: .clickable, .interactive; far: 40; lineColor: #9ad8ff; lineOpacity: 0.6"></a-entity>
+
+    <a-entity id="dreaming" position="0 1.6 -2.2" visible="false"></a-entity>
+
+    <a-entity id="generated-world"></a-entity>
+  </a-scene>
+
+</body>
+</html>
